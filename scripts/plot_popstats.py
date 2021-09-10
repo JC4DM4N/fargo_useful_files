@@ -50,9 +50,9 @@ def bin_semimajor_axes(values):
 
 plt.figure('rplot_binary')
 radii, binned_a = bin_semimajor_axes(radii_binary[:,0])
-plt.bar(radii,binned_a,label='initial',alpha=0.5,rwidth=0.9)
+plt.bar(radii,binned_a,label='initial',alpha=0.5)
 radii, binned_a = bin_semimajor_axes(radii_binary[:,1])
-plt.bar(radii,binned_a,label='initial',alpha=0.5,rwidth=0.9)
+plt.bar(radii,binned_a,label='initial',alpha=0.5)
 
 #plt.hist(radii_binary[:,0],label='initial',alpha=0.5,rwidth=0.9)
 #plt.hist(radii_binary[:,1],label='final',alpha=0.5,rwidth=0.9)
@@ -62,9 +62,9 @@ plt.xlabel('R (AU)')
 
 plt.figure('rplot_single')
 radii, binned_a = bin_semimajor_axes(radii_single[:,0])
-plt.bar(radii,binned_a,label='initial',alpha=0.5,rwidth=0.9)
+plt.bar(radii,binned_a,label='initial',alpha=0.5)
 radii, binned_a = bin_semimajor_axes(radii_single[:,1])
-plt.bar(radii,binned_a,label='initial',alpha=0.5,rwidth=0.9)
+plt.bar(radii,binned_a,label='initial',alpha=0.5)
 
 #plt.hist(radii_single[:,0],label='initial',alpha=0.5,rwidth=0.9)
 #plt.hist(radii_single[:,1],label='final',alpha=0.5,rwidth=0.9)
