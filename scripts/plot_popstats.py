@@ -70,7 +70,7 @@ def bin_dadt(values):
     # manually bin da/dt values
     bins = np.arange(0,1e-5)
     binned_values = [sum((values < bin) & (values >= bins[i-1])) for i,bin in enumerate(bins[1:])]
-    return radii, binned_values
+    return bins, binned_values
 
 plt.figure('dadt')
 bins, binned_dadt = bin_dadt(dadt_single)
