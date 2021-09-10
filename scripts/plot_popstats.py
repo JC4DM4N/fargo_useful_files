@@ -42,16 +42,32 @@ print('')
 print('Mean da/dt single star system: %.3f' %np.mean(dadt_single))
 print('Mean da/dt binary star system: %.3f' %np.mean(dadt_binary))
 
+def bin_semimajor_axes(values):
+    # manually bin planet semi-major axes between 0 and 100au
+    radii = np.arange(1,100)
+    binned_values = [sum((values < r) & (values >= r-1)) for r in radii]
+    return radii, binned_values
+
 plt.figure('rplot_binary')
-plt.hist(radii_binary[:,0],label='initial',alpha=0.5,rwidth=0.9)
-plt.hist(radii_binary[:,1],label='final',alpha=0.5,rwidth=0.9)
+radii, binned_a = bin_semimajor_axes(radii_binary[:,0])
+plt.bar(radii,binned_a,label='initial',alpha=0.5,rwidth=0.9)
+radii, binned_a = bin_semimajor_axes(radii_binary[:,1])
+plt.bar(radii,binned_a,label='initial',alpha=0.5,rwidth=0.9)
+
+#plt.hist(radii_binary[:,0],label='initial',alpha=0.5,rwidth=0.9)
+#plt.hist(radii_binary[:,1],label='final',alpha=0.5,rwidth=0.9)
 plt.legend()
 plt.grid()
 plt.xlabel('R (AU)')
 
 plt.figure('rplot_single')
-plt.hist(radii_single[:,0],label='initial',alpha=0.5,rwidth=0.9)
-plt.hist(radii_single[:,1],label='final',alpha=0.5,rwidth=0.9)
+radii, binned_a = bin_semimajor_axes(radii_single[:,0])
+plt.bar(radii,binned_a,label='initial',alpha=0.5,rwidth=0.9)
+radii, binned_a = bin_semimajor_axes(radii_single[:,1])
+plt.bar(radii,binned_a,label='initial',alpha=0.5,rwidth=0.9)
+
+#plt.hist(radii_single[:,0],label='initial',alpha=0.5,rwidth=0.9)
+#plt.hist(radii_single[:,1],label='final',alpha=0.5,rwidth=0.9)
 plt.legend()
 plt.grid()
 plt.xlabel('R (AU)')
