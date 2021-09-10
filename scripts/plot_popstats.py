@@ -74,9 +74,9 @@ def bin_dadt(values):
 
 plt.figure('dadt')
 bins, binned_dadt = bin_dadt(dadt_single)
-plt.bar(np.log10(bins[1:]),binned_values,label='single system',alpha=0.5)
+plt.bar(np.log10(bins[1:]),binned_dadt,label='single system',alpha=0.5)
 bins, binned_dadt = bin_dadt(dadt_binary)
-plt.bar(np.log10(bins[1:]),binned_values,label='binary system',alpha=0.5)
+plt.bar(np.log10(bins[1:]),binned_dadt,label='binary system',alpha=0.5)
 plt.legend()
 plt.grid()
 plt.show()
