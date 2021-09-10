@@ -53,9 +53,6 @@ radii, binned_a = bin_semimajor_axes(radii_binary[:,0])
 plt.bar(radii,binned_a,label='initial',alpha=0.5)
 radii, binned_a = bin_semimajor_axes(radii_binary[:,1])
 plt.bar(radii,binned_a,label='initial',alpha=0.5)
-
-#plt.hist(radii_binary[:,0],label='initial',alpha=0.5,rwidth=0.9)
-#plt.hist(radii_binary[:,1],label='final',alpha=0.5,rwidth=0.9)
 plt.legend()
 plt.grid()
 plt.xlabel('R (AU)')
@@ -65,16 +62,21 @@ radii, binned_a = bin_semimajor_axes(radii_single[:,0])
 plt.bar(radii,binned_a,label='initial',alpha=0.5)
 radii, binned_a = bin_semimajor_axes(radii_single[:,1])
 plt.bar(radii,binned_a,label='initial',alpha=0.5)
-
-#plt.hist(radii_single[:,0],label='initial',alpha=0.5,rwidth=0.9)
-#plt.hist(radii_single[:,1],label='final',alpha=0.5,rwidth=0.9)
 plt.legend()
 plt.grid()
 plt.xlabel('R (AU)')
 
+def bin_dadt(values):
+    # manually bin da/dt values
+    bins = np.arange(0,1e-5)
+    binned_values = [sum((values < bin) & (values >= bins[i-1])) for i,bin in enumerate(bins[1:])]
+    return radii, binned_values
+
 plt.figure('dadt')
-plt.hist(dadt_single,label='single system',alpha=0.5,rwidth=0.9)
-plt.hist(dadt_binary,label='binary system',alpha=0.5,rwidth=0.9)
+bins, binned_dadt = bin_dadt(dadt_single)
+plt.bar(bins,binned_dadt,label='single system',alpha=0.5)
+bins, binned_dadt = bin_dadt(dadt_binary)
+plt.bar(bins,binned_dadt,label='binary system',alpha=0.5)
 plt.legend()
 plt.grid()
 plt.show()
