@@ -78,5 +78,3 @@ plt.hist(dadt_binary,label='binary system',alpha=0.5,rwidth=0.9)
 plt.legend()
 plt.grid()
 plt.show()
-
-import pdb; pdb.set_trace()
