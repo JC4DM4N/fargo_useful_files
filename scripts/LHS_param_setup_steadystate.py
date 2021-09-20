@@ -23,18 +23,20 @@ Ms1_lims = np.asarray([0.85,1.2])                   # Primary star mass, Solar m
 iMs1 = 3
 Ms2_lims = np.asarray([0.08,0.4])                   # Secondary star mass, Solar masses
 iMs2 = 4
-alpha_lims = np.asarray([1e-4,1e-2])                # alpha viscosity limits
+alpha_lims = np.asarray([-3.0,-1.2])                # alpha viscosity limits (between 0.001 and 0.06)
 ialpha = 5
-pindex_lims = np.asarray([0.0,1.5])                 # Surface density profile exponent
+pindex_lims = np.asarray([1.0,1.5])                 # Surface density profile exponent
 ipindex = 6
 H_lims = np.asarray([0.025,0.1])                    # Disc aspect ratio
 iH = 7
-Md_lims = np.asarray([0.01,0.1])                    # Disc mass
-iMd = 8
+Rout_lims = np.asarray([75,150])                    # mass accretion rate limits
+iRout = 8
+Mdisc_lims = np.asarray([0.01,0.1])                 # disc mass
+iMdisc = 9
 
 headers = 'Rp,Mpl,a,Ms1,Ms2,alpha,pindex,H,Mdisc' #column headers for csv later
 
-lims = [Rp_lims,Mpl_lims,a_lims,Ms1_lims,Ms2_lims,alpha_lims,pindex_lims,H_lims,Md_lims]
+lims = [Rp_lims,Mpl_lims,a_lims,Ms1_lims,Ms2_lims,alpha_lims,pindex_lims,H_lims,Rout_lims,Mdisc_lims]
 nparams = len(lims)
 
 nsamp = 100
@@ -46,20 +48,27 @@ for i,lim in enumerate(lims):
     lhs[i,:] = lhs[i,:]*(lim[1]-lim[0]) + lim[0]
     lhs[i,:] = lhs[i,:]
 
+# un-log alpha and mdot
+#lhs[iMdot,:] = 10**lhs[iMdot,:]
+lhs[ialpha,:] = 10**lhs[ialpha,:]
+
 # calculate required grid size and timestep vals
 grid_rad = lhs[iRp,:] + 10    # 10 au greater than the planet location
 torb = 2*np.pi*grid_rad**(3./2.) # orbital period at grid outer radius
 dt = torb/100.
 tvisc = 4./9.*(grid_rad**2/lhs[ialpha,:]**2/lhs[iH,:]**2)*np.sqrt(grid_rad**3/lhs[iMs1,:])
 
-# calc sigma0 from disc mass and pindex
-# NOTE: this assumes this disc mass extent is 100au NOT just the size of the grid
-sig0 = lhs[iMd,:]/np.pi/(100**(3-lhs[ipindex,:])/(3-lhs[ipindex,:]))
+# for steady state solution with radially constant mdot, H/R must have some radial dependence (flaring index)
+# which can be determined from the sigma slope (pindex)
+flaring_index = 0.5 - (np.sqrt(1.5 - lhs[ipindex,:]))**2
 
-# calc steady state solution for mdot, assuming Rin=1AU, hence omega=1
-# we have mdot = 3*pi*alpha*H0^2*sigma0*omega0
-# this is approximate, as H is assumed to be constant here, so I am just taking H0=H
-Mdot = 3*np.pi*lhs[ialpha,:]*lhs[iH]**2*sig0
+# now have radially constant mdot, so can just calc mdot at R=1
+
+# calc sigma0 from disc mass and pindex
+sig0 = lhs[iMdisc,:]/np.pi/(lhs[iRout,:]**(3-lhs[ipindex,:])/(3-lhs[ipindex,:]))
+omega0 = np.sqrt(lhs[iMs1,:])
+
+mdot = 3*np.pi*lhs[ialpha,:]*lhs[iH,:]**2*sig0*omega0
 
 """
 Now write these params to the setup file fargo.par and planet file
@@ -102,7 +111,7 @@ for i in range(nsamp):
         file.write('\n')
         file.write('### Disk parameters \n')
         file.write('\n')
-        file.write('Mdot                %s \n' %str(Mdot[i]))
+        file.write('Mdot                %s \n' %str(mdot))
         file.write('MstarSS             %.2f            Ensure MstarSS matches the MStar in src/fondam.h \n' %lhs[iMs1,i]) ##MAY NEED TO CHANGE THIS THEN
         file.write('GScale              1.0 \n')
         file.write('PISTEADY            3.141592654 \n')
@@ -111,7 +120,7 @@ for i in range(nsamp):
         file.write('Alpha			    %.4f \n' %lhs[ialpha,i])
         file.write('AlphaSS			    %.4f \n' %lhs[ialpha,i])
         file.write('SigmaSlope		    %.2f		    Slope for the surface density \n' %lhs[ipindex,i])
-        file.write('FlaringIndex		0.0		        Slope for the aspect-ratio \n')
+        file.write('FlaringIndex		%.2f		        Slope for the aspect-ratio \n' %flaring_index[i])
         file.write('\n')
         file.write('### Planet parameters \n')
         file.write('\n')
@@ -139,7 +148,7 @@ for i in range(nsamp):
         file.write('### Output control parameters \n')
         file.write('\n')
         file.write('DT			%.5f		Physical time between fine-grain outputs \n' %dt[i])
-        file.write('Ninterm	    100		    Number of DTs between scalar fields outputs \n')
+        file.write('Ninterm	    1000		    Number of DTs between scalar fields outputs \n')
         file.write('Ntot		%i		Total number of DTs \n' %int(tvisc[i]/dt[i]))
         file.write('\n')
         if j==0:
@@ -189,4 +198,13 @@ for i in range(nsamp):
 
 # finally, write LHS parameters to a csv for reference
 with open('fresh_batch/setups.csv', 'w') as f:
-    np.savetxt(f, lhs.T, delimiter=',', header=headers)
+    f.write("Rplanet, Mplanet, binary sep, mstar1, mstar2, alpha, pindex, H, mdot, Rout, Mdisc, tvisc \n")
+    for i in range(nsamp):
+        f.write("{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {} \n".format(
+                                                            lhs[iRp,i], lhs[iMpl,i], lhs[ia,i], lhs[iMs1,i],
+                                                            lhs[iMs2,i], lhs[ialpha,i], lhs[ipindex,i], lhs[iH,i],
+                                                            mdot[i], lhs[iRout,i], lhs[iMdisc,i], tvisc[i]
+                                                            )
+            )
+    f.close()
+    #np.savetxt(f, lhs.T, delimiter=',', header=headers)
