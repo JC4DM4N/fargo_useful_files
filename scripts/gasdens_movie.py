@@ -23,8 +23,8 @@ im = plt.imshow(np.log10(rho),origin='lower',cmap=cm.Oranges_r,aspect='auto',
                 animated=True)
 #function for funcanimate animation
 def animate(i):
-    rho = np.fromfile('gasdens%i.dat' %(i*10)).reshape(128,384)
-    print('Plotting dump %i...' %(i*10))
+    rho = np.fromfile('gasdens%i.dat' %(i)).reshape(128,384)
+    print('Plotting dump %i...' %(i))
     im = plt.imshow(np.log10(rho),origin='lower',cmap=cm.Oranges_r,aspect='auto',
                     animated=True)
     return im
