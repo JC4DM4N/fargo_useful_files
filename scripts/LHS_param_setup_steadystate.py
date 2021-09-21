@@ -111,7 +111,7 @@ for i in range(nsamp):
         file.write('\n')
         file.write('### Disk parameters \n')
         file.write('\n')
-        file.write('Mdot                %s \n' %str(mdot))
+        file.write('Mdot                %s \n' %str(mdot[i]))
         file.write('MstarSS             %.2f            Ensure MstarSS matches the MStar in src/fondam.h \n' %lhs[iMs1,i]) ##MAY NEED TO CHANGE THIS THEN
         file.write('GScale              1.0 \n')
         file.write('PISTEADY            3.141592654 \n')
@@ -198,12 +198,14 @@ for i in range(nsamp):
 
 # finally, write LHS parameters to a csv for reference
 with open('fresh_batch/setups.csv', 'w') as f:
-    f.write("Rplanet, Mplanet, binary sep, mstar1, mstar2, alpha, pindex, H, mdot, Rout, Mdisc, tvisc \n")
+    f.write("Rplanet, Mplanet, binary sep, mstar1, mstar2, alpha, pindex, H, " +
+            "mdot, Rout, Mdisc, sig0, tvisc, flaring_index \n")
     for i in range(nsamp):
-        f.write("{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {} \n".format(
+        f.write("{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {} \n".format(
                                                             lhs[iRp,i], lhs[iMpl,i], lhs[ia,i], lhs[iMs1,i],
                                                             lhs[iMs2,i], lhs[ialpha,i], lhs[ipindex,i], lhs[iH,i],
-                                                            mdot[i], lhs[iRout,i], lhs[iMdisc,i], tvisc[i]
+                                                            mdot[i], lhs[iRout,i], lhs[iMdisc,i], sig0[i], tvisc[i],
+                                                            flaring_index[i]
                                                             )
             )
     f.close()
