@@ -119,7 +119,7 @@ for i in range(nsamp):
         file.write('Sigma0		        %s          	Surface Density at r=1 \n' %str(sig0[i]))
         file.write('Alpha			    %.4f \n' %lhs[ialpha,i])
         file.write('AlphaSS			    %.4f \n' %lhs[ialpha,i])
-        file.write('SigmaSlope		    %.2f		    Slope for the surface density \n' %lhs[ipindex,i])
+        file.write('SigmaSlope		    %.2f		    Slope for the surface density \n' %((-1)*lhs[ipindex,i]))
         file.write('FlaringIndex		%.2f		        Slope for the aspect-ratio \n' %flaring_index[i])
         file.write('\n')
         file.write('### Planet parameters \n')
